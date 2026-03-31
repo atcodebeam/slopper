@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Slopper — Pushing to prod...</title>
+
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Slopper — Vibes-based development" />
+    <meta property="og:description" content="Pushing to prod..." />
+    <meta property="og:image" content="og.png" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Slopper — Vibes-based development" />
+    <meta name="twitter:description" content="Pushing to prod..." />
+    <meta name="twitter:image" content="og.png" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family:
+          'DM Sans',
+          -apple-system,
+          BlinkMacSystemFont,
+          sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        background: #050505;
+        color: #e5e5e5;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .spinner-container {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+        font-size: 3rem;
+        font-weight: 500;
+        letter-spacing: -0.02em;
+        color: #e87a2a;
+      }
+
+      /* Claude Code asterisk/star spinner */
+      .spinner {
+        line-height: 1;
+        animation: spinPulse 1.2s ease-in-out infinite;
+      }
+
+      @keyframes spinPulse {
+        0% {
+          transform: rotate(0deg) scale(1);
+          opacity: 0.7;
+        }
+        50% {
+          transform: rotate(180deg) scale(1.15);
+          opacity: 1;
+        }
+        100% {
+          transform: rotate(360deg) scale(1);
+          opacity: 0.7;
+        }
+      }
+
+      .verb {
+        line-height: 1.2;
+      }
+
+      .verb-text {
+        display: inline-block;
+        white-space: nowrap;
+        animation: fadeSlideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      }
+
+      .verb-text.exiting {
+        display: none;
+      }
+
+      @keyframes fadeSlideIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+          filter: blur(4px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+          filter: blur(0);
+        }
+      }
+
+      @keyframes fadeSlideOut {
+        from {
+          opacity: 1;
+          transform: translateY(0);
+          filter: blur(0);
+        }
+        to {
+          opacity: 0;
+          transform: translateY(-20px);
+          filter: blur(4px);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="spinner-container">
+      <div class="spinner">&#10035;</div>
+      <div class="verb" id="verb">
+      </div>
+    </div>
+
+    <script>
+      const SLOPPER_VERBS = [
+        'Slopping',
+        'Degenerating',
+        'YOLOing',
+        'Crashing',
+        'Pushing to prod',
+        'Violating',
+        'Inflating',
+        'LOCing',
+        'Gaslighting',
+        'Pretending',
+        'Scamming',
+        'Gambling',
+        'Praying',
+        'Jamming',
+        'Trying',
+        'Crying',
+        'Leaking',
+        'Breaching',
+        'Frying',
+        'Hacking',
+        'Exaggerating',
+        'Underdelivering',
+        'Overpromising',
+        'Hallucinating',
+        'Vibing',
+        'Procrastinating',
+        'Rubber-ducking',
+        'Stack Overflowing',
+        'Rage-quitting',
+        'Bikeshedding',
+        'Yak-shaving',
+        'Cargo-culting',
+        'Copypasting',
+        'Blaming the intern',
+        'Rewriting in Rust',
+        'Deleting node_modules',
+        'Googling the error',
+        'Closing as wontfix',
+        'Mass-reverting',
+        'Nuking from orbit',
+        'Ignoring tests',
+        'Skipping code review',
+        'Disabling linter',
+        'Hardcoding secrets',
+        'Shipping anyway',
+        'Adding TODO',
+        'Blaming DNS',
+        'Clearing cache',
+        'Turning it off and on',
+        'Praying to Jenkins',
+        'Summoning demons',
+        'Consulting ChatGPT',
+        'Burning tokens',
+        'Winging it',
+        'Moving fast breaking things',
+        'Deploying on Friday',
+        'Trusting the process',
+        'Embracing chaos',
+        'Refactoring refactors',
+        'Over-engineering',
+        'Sprinkling AI',
+        'Pivoting',
+        'Synergizing',
+        'Disrupting',
+        'Leveraging blockchain',
+        'Draining runway',
+        'Faking metrics',
+        'Padding estimates',
+        'Using exploit',
+        'Ghosting',
+      ];
+
+      const verbContainer = document.getElementById('verb');
+      let lastIndex = -1;
+
+      function pickRandom() {
+        let index;
+        do {
+          index = Math.floor(Math.random() * SLOPPER_VERBS.length);
+        } while (index === lastIndex);
+        lastIndex = index;
+        return SLOPPER_VERBS[index];
+      }
+
+      function cycleVerb() {
+        const current = verbContainer.querySelector('.verb-text');
+        if (current) {
+          current.remove();
+        }
+        const verb = pickRandom();
+        const next = document.createElement('span');
+        next.className = 'verb-text';
+        next.textContent = verb + '...';
+        verbContainer.appendChild(next);
+        document.title = 'Slopper — ' + verb + '...';
+      }
+
+      const MIN_INTERVAL_MS = 1800;
+      const MAX_INTERVAL_MS = 3500;
+
+      function scheduleNext() {
+        const delay = MIN_INTERVAL_MS + Math.random() * (MAX_INTERVAL_MS - MIN_INTERVAL_MS);
+        setTimeout(() => {
+          cycleVerb();
+          scheduleNext();
+        }, delay);
+      }
+
+      cycleVerb();
+      scheduleNext();
+    </script>
+  </body>
+</html>
